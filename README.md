@@ -14,14 +14,11 @@ A comprehensive framework for building AI agents in Google Apps Script, supporti
 
 ## Installation
 
-1. Copy the `Code.gs` file into your Google Apps Script project
-2. Add the framework to your project:
-
-```javascript
-const AIAgentFramework = (function() {
-    // Paste Code.gs contents here
-})();
-```
+1. Open your Google Apps Script project
+2. Go to Resources > Libraries
+3. Add this Script ID: `1wTKmWGcF6YKLKU_Tgxt5buIpPRsFlbg51rHdrHhLf49Y9MDuCjEkLrUk`
+4. Select the latest version
+5. Click Add
 
 ## Usage
 
