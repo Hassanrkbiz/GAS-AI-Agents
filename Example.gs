@@ -2,11 +2,11 @@
 const config = {
     providerModel: "deepseek:deepseek-chat", // Example: OpenAI GPT-4
     systemPrompt: "You are a helpful assistant.",
-    apiKey: "deep-seek-api-key", // Replace with your actual API key
+    apiKey: "replace-api-key-here", // Replace with your actual API key
 };
 
 // Initialize the agent
-const agent = new AIAgentFramework.Agent(config);
+const agent = new AIAgent.Agent(config);
 
 // Example 1: Basic text generation with context
 function generateTextExample() {
@@ -97,6 +97,3 @@ function runExamples() {
     console.log("\n=== History Management Example ===");
     historyManagementExample();
 }
-
-// Execute the examples
-runExamples();

@@ -3,7 +3,7 @@
  * Supports tool use and JSON mode for all providers.
  * @namespace
  */
-const AIAgentFramework = (function () {
+const AIAgent = (function () {
   // Utility Functions
   const Utils = {
     /**
@@ -103,11 +103,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.openai.com/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -130,11 +126,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.openai.com/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -158,11 +150,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.openai.com/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -195,20 +183,20 @@ const AIAgentFramework = (function () {
     generateText(prompt, options = {}) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
       // Convert messages to Gemini's contents format
-      const contents = (options.messages || []).map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
+      const contents = (options.messages || []).map((msg) => ({
+        role: msg.role === "assistant" ? "model" : "user",
+        parts: [{ text: msg.content }],
       }));
-      
+
       // Handle system instruction separately
-      const systemInstruction = [];
+      let systemInstruction = {};
       if (this.systemPrompt) {
-        systemInstruction.push({
+        systemInstruction = {
           role: "user",
           parts: [{ text: this.systemPrompt }],
-        });
+        };
       }
-      
+
       // Add current prompt
       contents.push({
         role: "user",
@@ -236,16 +224,16 @@ const AIAgentFramework = (function () {
     generateJson(prompt, options = {}) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
       // Convert messages to Gemini's contents format
-      const contents = (options.messages || []).map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
+      const contents = (options.messages || []).map((msg) => ({
+        role: msg.role === "assistant" ? "model" : "user",
+        parts: [{ text: msg.content }],
       }));
-      const systemInstruction = [];
+      let systemInstruction = {};
       if (this.systemPrompt) {
-        systemInstruction.push({
+        systemInstruction = {
           role: "user",
           parts: [{ text: this.systemPrompt }],
-        });
+        };
       }
       contents.push({
         role: "user",
@@ -274,16 +262,16 @@ const AIAgentFramework = (function () {
     useTools(prompt, tools = [], options = {}) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
       // Convert messages to Gemini's contents format
-      const contents = (options.messages || []).map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
+      const contents = (options.messages || []).map((msg) => ({
+        role: msg.role === "assistant" ? "model" : "user",
+        parts: [{ text: msg.content }],
       }));
-      const systemInstruction = [];
+      let systemInstruction = {};
       if (this.systemPrompt) {
-        systemInstruction.push({
+        systemInstruction = {
           role: "user",
           parts: [{ text: this.systemPrompt }],
-        });
+        };
       }
       contents.push({
         role: "user",
@@ -324,11 +312,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.anthropic.com/v1/messages";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -338,6 +322,7 @@ const AIAgentFramework = (function () {
       const headers = {
         "Content-Type": "application/json",
         "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
       };
       const response = Utils.makeApiRequest(url, {
         method: "post",
@@ -351,43 +336,31 @@ const AIAgentFramework = (function () {
       const url = "https://api.anthropic.com/v1/messages";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
         max_tokens: options.max_tokens || 50,
         temperature: options.temperature || 0.7,
-        response_format: { type: "json_object" },
       };
       const headers = {
         "Content-Type": "application/json",
         "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
       };
       const response = Utils.makeApiRequest(url, {
         method: "post",
         headers: headers,
         payload: JSON.stringify(payload),
       });
-      return JSON.parse(response.content[0].text.trim());
+      return response.content[0].text.trim();
     }
 
     useTools(prompt, tools = [], options = {}) {
       const url = "https://api.anthropic.com/v1/messages";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -402,13 +375,28 @@ const AIAgentFramework = (function () {
       const headers = {
         "Content-Type": "application/json",
         "x-api-key": this.apiKey,
+        "anthropic-version": "2023-06-01",
       };
       const response = Utils.makeApiRequest(url, {
         method: "post",
         headers: headers,
         payload: JSON.stringify(payload),
       });
-      return response.content[0].tool_use;
+
+      let toolsList = response.content.filter((tool) => {
+        return tool.type === "tool_use";
+      });
+
+      // Normalize Anthropic's tool response format
+      return toolsList.map((tool, index) => ({
+        type: "function",
+        id: tool.id,
+        index: index,
+        function: {
+          name: tool.name,
+          arguments: tool.input,
+        },
+      }));
     }
   }
 
@@ -418,11 +406,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.deepseek.com/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -445,11 +429,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.deepseek.com/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -473,11 +453,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.deepseek.com/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -511,11 +487,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.openrouter.ai/api/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -538,11 +510,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.openrouter.ai/api/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -566,11 +534,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.openrouter.ai/api/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -604,11 +568,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.fireworks.ai/inference/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -631,11 +591,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.fireworks.ai/inference/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -659,11 +615,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.fireworks.ai/inference/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -697,11 +649,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.together.xyz/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -724,11 +672,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.together.xyz/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -752,11 +696,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.together.xyz/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -790,11 +730,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.deepinfra.com/v1/openai/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -817,11 +753,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.deepinfra.com/v1/openai/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -845,11 +777,7 @@ const AIAgentFramework = (function () {
       const url = "https://api.deepinfra.com/v1/openai/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -892,7 +820,7 @@ const AIAgentFramework = (function () {
       // Initialize with system prompt if provided
       if (this.systemPrompt) {
         this.messages.push({
-          role: "system",
+          role: this.provider !== "anthropic" ? "system" : "user",
           content: this.systemPrompt,
         });
       }
@@ -905,7 +833,7 @@ const AIAgentFramework = (function () {
       this.messages = [];
       if (this.systemPrompt) {
         this.messages.push({
-          role: "system",
+          role: this.provider !== "anthropic" ? "system" : "user",
           content: this.systemPrompt,
         });
       }
@@ -976,10 +904,9 @@ const AIAgentFramework = (function () {
      * @returns {object} - Result of the function
      */
     execute(prompt, options = {}) {
-      // Add user message to history
       this.messages.push({
         role: "user",
-        content: prompt,
+        content: typeof prompt === "string" ? prompt : JSON.stringify(prompt),
       });
 
       const result = this.module.generateText(prompt, {
@@ -987,11 +914,17 @@ const AIAgentFramework = (function () {
         messages: this.messages,
       });
 
-      // Add assistant response to history
-      this.messages.push({
-        role: "assistant",
-        content: result,
-      });
+      // Check if this exact assistant message already exists in history
+      const isDuplicateAssistantMessage = this.messages.some(
+        (msg) => msg.role === "assistant" && msg.content === result
+      );
+
+      if (!isDuplicateAssistantMessage) {
+        this.messages.push({
+          role: "assistant",
+          content: typeof result === "string" ? result : JSON.stringify(result),
+        });
+      }
 
       return { data: result };
     }
@@ -1006,7 +939,7 @@ const AIAgentFramework = (function () {
       // Add user message to history
       this.messages.push({
         role: "user",
-        content: prompt,
+        content: typeof prompt === "string" ? prompt : JSON.stringify(prompt),
       });
 
       const result = this.module.generateJson(prompt, {
@@ -1017,7 +950,7 @@ const AIAgentFramework = (function () {
       // Add assistant response to history
       this.messages.push({
         role: "assistant",
-        content: result,
+        content: typeof result === "string" ? result : JSON.stringify(result),
       });
 
       return { data: result };
@@ -1031,10 +964,10 @@ const AIAgentFramework = (function () {
      * @returns {object} - Tool response
      */
     executeTools(prompt, tools = [], options = {}) {
-      // Add user message to history
+      // Add user message to history as string
       this.messages.push({
         role: "user",
-        content: prompt,
+        content: typeof prompt === "string" ? prompt : JSON.stringify(prompt),
       });
 
       const result = this.module.useTools(prompt, tools, {
@@ -1042,10 +975,10 @@ const AIAgentFramework = (function () {
         messages: this.messages,
       });
 
-      // Add assistant response to history
+      // Add assistant response to history as string
       this.messages.push({
         role: "assistant",
-        content: JSON.stringify(result),
+        content: typeof result === "string" ? result : JSON.stringify(result),
       });
 
       return { data: result };
@@ -1055,14 +988,10 @@ const AIAgentFramework = (function () {
   // Module: Groq
   class GroqModule extends BaseModule {
     generateText(prompt, options = {}) {
-      const url = "https://api.groq.com/v1/chat/completions";
+      const url = "https://api.groq.com/openai/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -1082,14 +1011,10 @@ const AIAgentFramework = (function () {
     }
 
     generateJson(prompt, options = {}) {
-      const url = "https://api.groq.com/v1/chat/completions";
+      const url = "https://api.groq.com/openai/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,
@@ -1110,14 +1035,10 @@ const AIAgentFramework = (function () {
     }
 
     useTools(prompt, tools = [], options = {}) {
-      const url = "https://api.groq.com/v1/chat/completions";
+      const url = "https://api.groq.com/openai/v1/chat/completions";
       // Use existing messages from options or initialize
       const messages = options.messages || [];
-      // Add current prompt
-      messages.push({
-        role: "user",
-        content: prompt,
-      });
+
       const payload = {
         model: options.model || this.model,
         messages: messages,

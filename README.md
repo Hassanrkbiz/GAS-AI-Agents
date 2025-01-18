@@ -1,4 +1,4 @@
-# GAS AI Agentic Framework
+# GAS AI Agents Framework
 
 A comprehensive framework for building AI agents in Google Apps Script, supporting multiple providers with consistent interfaces for text generation, JSON responses, and tool usage.
 
@@ -10,6 +10,7 @@ A comprehensive framework for building AI agents in Google Apps Script, supporti
 - **Tool usage**: Supports function calling/tool usage where available
 - **JSON mode**: Structured JSON responses when needed
 - **History management**: Clear and retrieve conversation history
+- **Normalized responses**: Consistent tool response format across providers
 
 ## Installation
 
@@ -18,7 +19,7 @@ A comprehensive framework for building AI agents in Google Apps Script, supporti
 
 ```javascript
 const AIAgentFramework = (function() {
-    // Paste Code.js contents here
+    // Paste Code.gs contents here
 })();
 ```
 
@@ -69,7 +70,19 @@ const result = agent.executeTools(
     "What's the weather in San Francisco?",
     tools
 );
-console.log(result.data); // Tool calls
+
+// Normalized tool response format:
+// [
+//   {
+//     type: "function",
+//     id: "call_123",
+//     function: {
+//     name: "get_weather",
+//     arguments: "{\"location\":\"San Francisco, CA\"}"
+//     }
+//   }
+// ]
+console.log(result.data);
 ```
 
 ### Managing Conversation History
@@ -108,6 +121,16 @@ See the `Example.gs` file for complete usage examples demonstrating:
 - Tool usage
 - Conversation history management
 - Multi-turn conversations
+
+## Contributing
+
+We welcome contributions to the GAS AI Agents Framework! If you'd like to contribute:
+
+1. Fork the repository
+2. Create a new branch for your feature or bugfix
+3. Submit a pull request
+
+If you find this project useful, please consider giving it a star to show your support!
 
 ## License
 
